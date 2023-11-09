@@ -32,17 +32,25 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     })
+   
     app.get('/detail/:id', async(req, res)=>{
        const id= req.params.id;
        const query = {_id: new ObjectId(id)}
        const options ={
-        projection: { FoodName:1 ,FoodImage:1 ,FoodCategory:1 ,Price:1 ,MadeBy:1 ,FoodOrigin:1 ,Description:1}
+        projection: { FoodName:1 ,FoodImage:1 ,FoodCategory:1 ,Price:1 ,MadeBy:1 ,FoodOrigin:1 ,Description:1, Quantity:1, OrderNumber:1}
        };
        const result = await foodCollection.findOne(query,options);
        res.send(result);
     })
     app.get('/order', async(req, res)=>{
-        const cursor = orderCollection.find();
+        console.log(req.query);
+        let query = {};
+        if(req.query?.email){
+            
+            query = {email: req.query.email}
+            console.log(query)
+        }
+        const cursor = orderCollection.find(query);
         const result = await cursor.toArray();
         res.send(result);
     })
@@ -52,6 +60,23 @@ async function run() {
         const result = await orderCollection.insertOne(order);
         res.send(result)
     })
+    app.get('/menu', async(req, res)=>{
+        if(req.query?.email){
+            
+            query = {email: req.query.email}
+            console.log(query)
+        }
+        const cursor = foodCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+    app.post('/menu', async (req, res) => {
+        const newMenu = req.body;
+        console.log(newMenu);
+        const result = await foodCollection.insertOne(newMenu);
+        res.send(result)
+      })
+    
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
