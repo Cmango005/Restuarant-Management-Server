@@ -59,7 +59,7 @@ async function run() {
             const result = await orderCollection.insertOne(order);
             res.send(result)
         })
-        
+
         app.delete('/order/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
@@ -82,7 +82,25 @@ async function run() {
             const result = await foodCollection.insertOne(newMenu);
             res.send(result)
         })
-        
+        app.put('/menu/:id', async (req, res) => {
+
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const newUpdate = req.body;
+            const product = {
+                $set: {
+                    FoodName: newUpdate.FoodName,
+                    FoodImage: newUpdate.FoodImage,
+                    FoodCategory: newUpdate.FoodCategory,
+                    Price: newUpdate.Price,
+                    Description: newUpdate.Description,
+                    Quantity: newUpdate.Quantity
+                }
+            }
+            const result = await foodCollection.updateOne(filter, product, options);
+            res.send(result)
+        })
 
 
         // Send a ping to confirm a successful connection
